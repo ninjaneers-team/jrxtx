@@ -16,3 +16,14 @@ librxtxSerial.la
 libtool
 stamp-h1
 stamp-h.in
+Makefile.in
+config.h.in
+missing
+ltmain.sh
+configure
+
+i*86-*/
+x86_64-*/
+amd64*/
+arm-*/
+dummy_javafiles
