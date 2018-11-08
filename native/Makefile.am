@@ -66,6 +66,11 @@ JARTARGET=RXTXcomm.jar
 CLASSDIR=gnu.io
 CLASSTOP=gnu
 CLASSDEST=gnu/io
+
+#TODO FROM jrxtx --- necessary?
+# linking java-jdk headers to lib
+#AM_LDFLAGS = -l$(JAVANATINC) -l$(JAVANATINC)
+
 ####################### tools
 LIBTOOLC=$(GLIBTOOL) --mode=compile $(CC) $(INCLUDES) $(CPPFLAGS) $(CFLAGS) $(VERBOSE_IOEXCEPTIONS) -c
 LIBTOOL_INST=$(GLIBTOOL) --mode=install $(INSTALL_PROGRAM)
