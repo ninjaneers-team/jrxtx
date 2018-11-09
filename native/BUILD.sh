@@ -1,9 +1,9 @@
 #!/bin/sh
-set -euo pipefail
+set -eu
 
 ./autogen.sh
 
-./configure
+./configure "$@"
 
 make clean
 make

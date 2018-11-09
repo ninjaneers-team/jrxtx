@@ -60,12 +60,9 @@ abs_srcdir=$(TOP)/@srcdir@
 VPATH = @srcdir@
 
 AUTOMAKE_OPTIONS = foreign
-INCLUDES= -I$(TOP) -I$(DEST) -I. $(JAVAINCLUDE) $(JAVANATINC)
+INCLUDES= -I$(TOP) -I$(DEST) -I. -Iinclude $(JAVAINCLUDE) $(JAVANATINC)
 ####################### vars for rxtx-1.4->1.5 transition
-JARTARGET=RXTXcomm.jar
-CLASSDIR=gnu.io
-CLASSTOP=gnu
-CLASSDEST=gnu/io
+PACKAGE_NAME=gnu.io
 
 #TODO FROM jrxtx --- necessary?
 # linking java-jdk headers to lib
@@ -77,13 +74,20 @@ LIBTOOL_INST=$(GLIBTOOL) --mode=install $(INSTALL_PROGRAM)
 ####################### dirs
 SPATH = $(abs_srcdir)/src
 DEST=$(target_triplet)
+###
+JAVA_SRCDIR = $(abs_srcdir)/../src/main-rxtx/java/gnu/io/
+JAVA_CLASSPATH = $(abs_srcdir)/../build/classes/java/main
+JAVA_CLASSDIR = $(JAVA_CLASSPATH)/gnu/io
+JAVA_HDIR = $(target_triplet)/include
 ####################### rules
-CLASSES = $(patsubst $(SPATH)/gnu/io/%.java,$(TOP)/$(CLASSDEST)/%.class,$(wildcard $(SPATH)/gnu/io/*.java))
-javafiles = $(wildcard $(SPATH)/gnu/io/*.java)
-javahfiles = $(patsubst $(SPATH)/gnu/io/%.java,%,$(wildcard $(SPATH)/gnu/io/*.java))
+javafiles = $(wildcard $(JAVA_SRCDIR)/*.java)
+CLASSES = $(patsubst $(JAVA_SRCDIR)/%.java,$(JAVA_CLASSDIR)/%.class,$(javafiles))
+javahfiles = $(patsubst $(JAVA_SRCDIR)/%,$(JAVA_HDIR)/%,$(patsubst %.java,%.h,$(filter-out %package-info.java,$(javafiles))))
+#javahfiles = $(shell for i in $(javahbasenames);do if grep native.*\( $(JAVA_SRCDIR)/$$i.java >/dev/null ; then \echo $(PACKAGE_NAME).$$i;fi; done)
+javahbasenames = $(basename $(notdir $(javahfiles)))
 
 #######################
-CLEANFILES = $(TOP)/*.class $(TOP)/$(CLASSDEST)/*.class $(TOP)/$(JARTARGET)
+CLEANFILES = $(JAVA_HDIR) dummy_javafiles
 
 # for SCO builds everything else is currently using lib%.la below
 # I'm thinking about taking libtool out completely.  See also Mac OS X builds.
@@ -95,7 +99,7 @@ $(target_triplet)/lib%.so: $(SPATH)/%Imp.@EXTENSION@ $(CLASSES)
 #  LIBTOOL_FIX handles problems encountered on some OS's.  See configure.in
 #  If a LIBTOOL_FIX is added be sure to provide a trailing ';' in configure.in
 
-$(target_triplet)/librxtx%.@LIB_EXTENSION@: $(SPATH)/%Imp.c $(CLASSES) $(SPATH)/%Imp.h
+$(target_triplet)/librxtx%.@LIB_EXTENSION@: $(SPATH)/%Imp.c dummy_javahfiles $(SPATH)/%Imp.h
 	(								\
 	$(LIBTOOL_FIX)							\
 	cd $(DEST); 							\
@@ -111,20 +115,19 @@ $(target_triplet)/librxtx%.@LIB_EXTENSION@: $(SPATH)/%Imp.c $(CLASSES) $(SPATH)/
 	fi;								\
 	)
 
-#  compile src/RXTXPort.java and similar files into classes
-#  then create the .jar file
-$(CLASSES): $(javafiles) $(TOP)/Makefile
-	$(JAVAH_FIX)
-	$(JAVAC) $(javafiles)
-	$(JAVAH) `(for i in $(javahfiles);do \
-		if grep > /dev/null native.*\( $(SPATH)/gnu/io/$$i.java; then \
-			echo $(CLASSDIR).$$i; \
-		fi; \
-	done)`
-	$(JAR) cf $(JARTARGET) $(CLASSTOP)/*
+$(CLASSES): $(javafiles)
+	@rm dummy_javafiles
+	@echo "Please run './gradlew build' in the top directory after modifying the java files."
+	@exit 1
 
-#  install librxtxSerial.so into the proper directory and copy $(JARTARGET) to its
-#  proper location
+#$(javahfiles): $(javafiles) $(CLASSES)
+#	$(JAVAH) -d $(JAVA_HDIR) -classpath $(CLASSPATH):$(JAVA_CLASSPATH) $(PACKAGE_NAME).$(basename $(notdir $@))
+
+dummy_javahfiles: $(CLASSES)
+	touch dummy_javafiles
+	$(JAVAH) -d $(JAVA_HDIR) -classpath $(CLASSPATH):$(JAVA_CLASSPATH) $(addprefix $(PACKAGE_NAME).,$(javahbasenames))
+
+#  install librxtxSerial.so into the proper directory
 install: all
 	@$(LIBTOOL_INST) \
 	`for i in $(TARGETLIB);do \
@@ -132,10 +135,9 @@ install: all
 			echo $$i; \
 		fi; \
 	done` $(RXTX_PATH)
-	$(INSTALL_PROGRAM) $(JARTARGET) $(JHOME)/
 
 clean-generic:
-	rm -rf $(DEST) $(TOP)/$(CLASSTOP)
+	rm -rf $(DEST)
 	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 all: $(TARGETLIB)
