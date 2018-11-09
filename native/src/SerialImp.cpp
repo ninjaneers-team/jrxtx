@@ -140,20 +140,6 @@ JNIEXPORT void JNICALL RXTXPort(Initialize)(
 	sigaction( SIGIO, NULL, &handler );
 	if( !handler.sa_handler ) signal( SIGIO, SIG_IGN );
 #endif /* !__FreeBSD__ */
-#ifdef DEBUG
-	/* Lets let people who upgraded kernels know they may have problems */
-	if (uname (&name) == -1)
-	{
-		report("RXTX WARNING:  cannot get system name\n");
-		return;
-	}
-	if(!strcmp(name.release,UTS_RELEASE))
-	{
-		fprintf(stderr, LINUX_KERNEL_VERSION_ERROR, UTS_RELEASE,
-			name.release);
-		getchar();
-	}
-#endif /* DEBUG */
 #endif /* __BEOS__ */
 #endif /* WIN32 */
 }

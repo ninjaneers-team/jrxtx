@@ -318,23 +318,6 @@ JNIEXPORT void JNICALL RXTXPort(Initialize)(
 #if DEBUG_TIMING
 	gettimeofday(&seloop, NULL);
 #endif /* DEBUG_TIMING */
-#if defined(DEBUG) && defined(__linux__)
-	/* Lets let people who upgraded kernels know they may have problems */
-	if (uname (&name) == -1)
-	{
-		report( "RXTX WARNING:  cannot get system name\n" );
-		LEAVE( "RXTXPort:Initialize" );
-		return;
-	}
-	if(strcmp(name.release,UTS_RELEASE)!=0)
-	{
-		sprintf( message, LINUX_KERNEL_VERSION_ERROR, UTS_RELEASE,
-			name.release );
-		report( message );
-		getchar();
-	}
-	LEAVE( "RXTXPort:Initialize" );
-#endif /* DEBUG && __linux__ */
 }
 
 /*----------------------------------------------------------
