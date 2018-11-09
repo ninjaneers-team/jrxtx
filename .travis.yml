@@ -82,7 +82,7 @@ deploy:
     overwrite: true
     file_glob: true
     file:
-    - build/libs-all/*.jar
+    - build/libs/*.jar
     on:
       tags: true
       condition: "$TRAVIS_OS_NAME != osx"

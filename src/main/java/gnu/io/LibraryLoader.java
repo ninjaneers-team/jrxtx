@@ -66,7 +66,7 @@ class LibraryLoader {
         }
 
         String protocol = dirUrl.getProtocol();
-        if (protocol.equals("jar")) {
+        if (protocol.equals("jar") || protocol.equals("bundle")) {
             loadFromJar(dirUrl, libsDIr);
         }
         else if (protocol.equals("file")) {
