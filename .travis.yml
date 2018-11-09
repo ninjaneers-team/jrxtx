@@ -48,7 +48,7 @@ install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cd native && ./BUILD.sh && cd ..; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd native && ./BUILD.sh && cd ..; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd native && ./BUILD.sh --target=arm-linux-gnueabi --host=arm-linux-gnueabi && cd ..; fi
-- ./gradlew --info buildWithNative
+- ./gradlew buildWithNative # also copies files into build-native
 
 script:
 - ./gradlew check
@@ -61,15 +61,17 @@ deploy:
     skip_cleanup: true
     overwrite: true
     file_glob: true
-    file: 
+    file:
       - build-native/*
     on:
       tags: true
+      
+  ## wait some (for osx to finish building), then download native libs and deploy
   - provider: script
     api_key:
       secure: JwlNEGSjr6KFXSax24WA31XZdPlk1XMSFP8jDM+0lAtUvFRi2yw865KBEDJ2JFEAGskHze/0wL4fteyVsmG3LbWg6afsV6gFrpZCEIRHfGlYECbJTBao56cbxG31FlcrGKdehdR/0UTO6cbPzQj0I8atdY5GtILQK31d57sh4j7SkgtNdSGCa7Olg6Xil59RnrdJn9k4+cQiF4XeCgjsLg3bSnjczmjQIg1HPfpdWO6pQGXW219mdPBKfhTjs9bgejBkO+WW0L65rPcpZpvpAGdhCtDU8tX8RLwhd8YKmhx0KuGPJvRuaEwnYXzXMaiUyBNsuXjZxDoDEPGFctXBrj8i/Cz2g7uzam2oioWjr4d5qzej1O6aZC/GX2kPwIZLOTUvjE8D1L1GwHHVadunLo5jMFS5lROhQmtHC8RXtVjE+8uc7G5pkrOJ5Ic7ymnIpMd/Hv9neMO1a/b29Mq6kIsmbK/V2CUH2y41gG3Y4Njuc90Qv4EoZhYbjHJXAuhYRecXjJd5L0/oYnz5iSNrvlxfT/UdYggWTivetZl2XHQV2EWce8L+Ta71l0em+UPOv4ueJcETitLQw7WHoHKu7k/VCN5RgCUCrg5BZEd+7q1IDyS/IkM+mdxnlMrsl3iFNcg0hmV+5+UWyQBFuKjW8XqvyZYb+6lGuvUzZtw1iyo=
     skip_cleanup: true
-    script: ./download-native-jars.py && ./gradlew --info buildWithNative
+    script: sleep 300 && ./download-native-libs.py && ./gradlew buildWithNative
     on:
       tags: true
       condition: "$TRAVIS_OS_NAME != osx"

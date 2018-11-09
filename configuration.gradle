@@ -131,43 +131,52 @@ def conf = [
         // downloaded
         ("build-download/linux-x86-64-" + libName + ".so"): [
                 "target": "linux/x86-64",
-                "annotation": "osname=Linux;processor=x86-64"
+                "annotation": "osname=Linux;processor=x86-64",
+                "target_filename": libName + ".so",
         ],
         ("build-download/osx-x86-64-" + libName + ".jnilib"): [
                 "target": "osx/x86-64",
-                "annotation": "osname=MacOSX;processor=x86-64"
+                "annotation": "osname=MacOSX;processor=x86-64",
+                "target_filename": libName + ".jnilib",
         ],
         ("build-download/linux-arm/" + libName + ".so"): [
                 "target": "linux/arm",
-                "annotation": "osname=Linux;processor=arm"
+                "annotation": "osname=Linux;processor=arm",
+                "target_filename": libName + ".so",
         ],
         
         // built right here
-        ("x86_64-*linux-*/.libs/" + libName + ".so"): [
+        ("native/x86_64-*linux-*/.libs/" + libName + ".so"): [
                 "target": "linux/x86-64",
-                "annotation": "osname=Linux;processor=x86-64"
+                "annotation": "osname=Linux;processor=x86-64",
+                "target_filename": libName + ".so",
         ],
-        ("*-apple-darwin*/" + libName + ".jnilib"): [
+        ("native/*-apple-darwin*/" + libName + ".jnilib"): [
                 "target": "osx/x86-64",
-                "annotation": "osname=MacOSX;processor=x86-64"
+                "annotation": "osname=MacOSX;processor=x86-64",
+                "target_filename": libName + ".jnilib",
         ],
-        ("arm-unknown-linux-gnueabi/.libs/" + libName + ".so"): [
+        ("native/arm-unknown-linux-gnueabi/.libs/" + libName + ".so"): [
                 "target": "linux/arm",
-                "annotation": "osname=Linux;processor=arm"
+                "annotation": "osname=Linux;processor=arm",
+                "target_filename": libName + ".so",
         ],
 ]
 
 task copyNativeLibs(dependsOn: compileJava) {
 
     conf.each { pattern, map ->
-        fileTree(dir: "native", include: pattern).forEach { file ->
-            def outName = "libs/" + map['target'] + "/" + file.getName()
+        fileTree(dir: ".", include: pattern).forEach { file ->
+            println "Found file " + file
+            def outFileName = map['target_filename']
+            def outName = "libs/" + map['target'] + "/" + outFileName
             def fileOutDir = Paths.get(resDir.absolutePath, "libs", map['target'])
             
             doLast {
                 copy {
                     from file
                     into fileOutDir
+                    rename file.getName(), outFileName
                 }
                 copy {
                     from file
