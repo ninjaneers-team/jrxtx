@@ -25,3 +25,4 @@ lastconnection.properties
 build-native
 .idea
 jrxtx.iml
+build-download
