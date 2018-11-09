@@ -1,11 +1,13 @@
+import java.nio.file.Files
+import java.nio.file.Paths
 
 project.ext {
 
-  cfgJavaVersion = "1.5"
+  cfgJavaVersion = "1.8"
 
-  cfgVersion = "1.0.2-SNAPSHOT"
+  cfgVersion = "1.1.0-SNAPSHOT"
   
-  cfgGroup = "org.openmuc"
+  cfgGroup = "de.ninjaneers"
 
   cfgCopyDependencies = false
 
@@ -117,32 +119,51 @@ sourceSets {
 	}
 }
 
-task copyNativeLibs(type: Copy, dependsOn: compileJava) {
-  
-  from fileTree("native").files
-  def libName = "librxtxSerial"
-
-
-  include libName + ".dll"
-  include libName + ".jnilib"
-  include libName + ".so"
-
-  def resDir = project.sourceSets.main.output.resourcesDir
-  
-  into resDir.absolutePath + "/libs"
-
-}
-
+def libName = "librxtxSerial"
 def bundleNativeCode = (String[])[]
-
+def resDir = project.sourceSets.main.output.resourcesDir
+ 
 if (file("native/librxtxSerial.dll").exists()){
     bundleNativeCode = bundleNativeCode.plus("libs/librxtxSerial.dll;osname=Win32;processor=x86")
 }
-if (file("native/librxtxSerial.jnilib").exists()){
-    bundleNativeCode = bundleNativeCode.plus("libs/librxtxSerial.jnilib;osname=MacOSX;processor=x86-64")
-}
-if (file("native/.libs/librxtxSerial.so").exists()){
-    bundleNativeCode = bundleNativeCode.plus("libs/librxtxSerial.so;osname=Linux;processor=x86-64")
+
+def conf = [
+        ("x86_64-*linux-*/.libs/" + libName + ".so"): [
+                "target": "linux/x86-64",
+                "annotation": "osname=Linux;processor=x86-64"
+        ],
+        ("*-apple-darwin*/" + libName + ".jnilib"): [
+                "target": "osx/x86-64",
+                "annotation": "osname=MacOSX;processor=x86-64"
+        ],
+        ("arm-unknown-linux-gnueabi/.libs/" + libName + ".so"): [
+                "target": "linux/arm",
+                "annotation": "osname=Linux;processor=arm"
+        ],
+]
+
+task copyNativeLibs(dependsOn: compileJava) {
+
+    conf.each { pattern, map ->
+        fileTree(dir: "native", include: pattern).forEach { file ->
+            def outName = "libs/" + map['target'] + "/" + file.getName()
+            def fileOutDir = Paths.get(resDir.absolutePath, "libs", map['target'])
+            
+            doLast {
+                copy {
+                    from file
+                    into fileOutDir
+                }
+                copy {
+                    from file
+                    into "build-native/" 
+                    rename  file.getName(), map['target'].replaceAll('/', '-') + "-" + file.getName()
+                }
+            }
+
+            bundleNativeCode = bundleNativeCode.plus(outName + ";" + map['annotation'])
+        }
+    }
 }
 
 bundleNativeCode = bundleNativeCode.join(',')
@@ -159,17 +180,18 @@ task(buildWithNative) {
   dependsOn(copyNativeLibs)
   dependsOn(build)
   tasks.findByName("build").mustRunAfter "copyNativeLibs"
+    tasks.findByName("copyNativeLibs").mustRunAfter "processResources"
 }
 
 
 clean {
-  file("native").listFiles().each{
+  /*file("native").listFiles().each{
   	File f ->  
   		if (f.getName().contains("unknown")) {
   			delete f
   		}
   	}
-  
+  */
 }
 
 compileJava {
