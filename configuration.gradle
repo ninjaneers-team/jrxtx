@@ -139,6 +139,11 @@ def conf = [
                 "annotation": "osname=MacOSX;processor=x86-64",
                 "target_filename": libName + ".jnilib",
         ],
+        ("build-download/linux-armel/" + libName + ".so"): [
+                "target": "linux/armel",
+                "annotation": "osname=Linux;processor=armel",
+                "target_filename": libName + ".so",
+        ],
         ("build-download/linux-arm/" + libName + ".so"): [
                 "target": "linux/arm",
                 "annotation": "osname=Linux;processor=arm",
@@ -157,6 +162,11 @@ def conf = [
                 "target_filename": libName + ".jnilib",
         ],
         ("native/arm-unknown-linux-gnueabi/.libs/" + libName + ".so"): [
+                "target": "linux/armel",
+                "annotation": "osname=Linux;processor=armel",
+                "target_filename": libName + ".so",
+        ],
+        ("native/arm-unknown-linux-gnueabihf/.libs/" + libName + ".so"): [
                 "target": "linux/arm",
                 "annotation": "osname=Linux;processor=arm",
                 "target_filename": libName + ".so",

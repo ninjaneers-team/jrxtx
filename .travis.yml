@@ -17,7 +17,9 @@ addons:
     - automake
     - libtool
     - gcc-arm-linux-gnueabi
+    - gcc-arm-linux-gnueabihf
     - libc6-dev-armel-cross
+    - libc6-dev-armhf-cross
   homebrew:
     taps: homebrew/cask-versions
     casks:
@@ -47,6 +49,7 @@ install:
 - ./gradlew assemble
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then cd native && ./BUILD.sh && cd ..; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd native && ./BUILD.sh && cd ..; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd native && ./BUILD.sh --target=arm-linux-gnueabihf --host=arm-linux-gnueabihf && cd ..; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd native && ./BUILD.sh --target=arm-linux-gnueabi --host=arm-linux-gnueabi && cd ..; fi
 - ./gradlew buildWithNative # also copies files into build-native
 
