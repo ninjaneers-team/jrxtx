@@ -7,6 +7,7 @@ import shutil
 import sys
 from pprint import pprint
 import re
+import errno
 
 output = 'build-download'
 
@@ -51,10 +52,15 @@ if __name__ == "__main__":
     libs = filter(lambda a: LIBRARY_NAME in a['name'], assets)
     pprint([(l['name'], l['size']) for l in libs])
     
-    os.makedirs('%s' % output)
+    try:
+        os.makedirs('%s' % output)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise e
     for lib in libs:
         r = requests.get(lib['browser_download_url'], headers=headers)
-        with open(output + '/' + lib['name'], 'w') as f:
-            r.raw.decode_content = True
-            shutil.copyfileobj(r.raw, f)
-        print("written to", f.name)
+        with open(output + '/' + lib['name'], 'wb') as f:
+            for chunk in r.iter_content(chunk_size=512):
+                if chunk:  # filter out keep-alive new chunks
+                    f.write(chunk)
+        print("written to", f.name, os.stat(f.name).st_size)
