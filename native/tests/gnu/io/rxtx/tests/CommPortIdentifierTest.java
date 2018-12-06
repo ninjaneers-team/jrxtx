@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
 |   RXTX License v 2.1 - LGPL v 2.1 + Linking Over Controlled Interface.
 |   RXTX is a native interface to serial ports in java.
-|   Copyright 1997-2007 by Trent Jarvi tjarvi@qbang.org and others who
+|   Copyright 2008 Martin Oberhuber (Wind River) and others who
 |   actually wrote it.  See individual source files for more information.
 |
 |   A copy of the LGPL v 2.1 may be found at
@@ -27,7 +27,7 @@
 |   any confusion about linking to RXTX.   We want to allow in part what
 |   section 5, paragraph 2 of the LGPL does not permit in the special
 |   case of linking over a controlled interface.  The intent is to add a
-|   Java Specification Request or standards body defined interface in the 
+|   Java Specification Request or standards body defined interface in the
 |   future as another exception but one is not currently available.
 |
 |   http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
@@ -55,50 +55,54 @@
 |   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 |   All trademarks belong to their respective owners.
 --------------------------------------------------------------------------*/
-/* gnu.io.ParallelPort constants */
-/*  this appears to be handled in /usr/src/linux/misc/parport_pc.c */
-#define LPT_MODE_ANY	0
-#define LPT_MODE_SPP	1
-#define LPT_MODE_PS2	2
-#define LPT_MODE_EPP	3
-#define LPT_MODE_ECP	4
-#define LPT_MODE_NIBBLE	5
+package gnu.io.rxtx.tests;
 
-/* some popular releases of Slackware do not have SSIZE_MAX */
+import gnu.io.CommPortIdentifier;
+import gnu.io.NoSuchPortException;
 
-#ifndef SSIZE_MAX
-#	if defined(INT_MAX)
-#		define SSIZE_MAX  INT_MAX
-#	elif defined(MAXINT)
-#		define SSIZE_MAX MAXINT
-#	else
-#		define SSIZE_MAX 2147483647 /* ugh */
-#	endif
-#endif
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
-/* gnu.io.ParallelPortEvent constants */
-#define PAR_EV_ERROR	1
-#define PAR_EV_BUFFER	2
+import junit.framework.TestCase;
 
-/* java exception class names */
-#define UNSUPPORTED_COMM_OPERATION "gnu/io/UnsupportedCommOperationException"
-#define ARRAY_INDEX_OUT_OF_BOUNDS "java/lang/ArrayIndexOutOfBoundsException"
-#define OUT_OF_MEMORY "java/lang/OutOfMemoryError"
-#define IO_EXCEPTION "java/io/IOException"
-#define PORT_IN_USE_EXCEPTION "gnu/io/PortInUseException"
+public class CommPortIdentifierTest extends TestCase {
 
-/*
-Flow Control defines inspired by reading how mgetty by Gert Doering does it
-*/
+	public CommPortIdentifierTest(String testName) {
+		super(testName);
+	}
 
-/* PROTOTYPES */
-jboolean is_interrupted(JNIEnv *, jobject );
-int send_event(JNIEnv *, jobject, jint, int );
-int read_byte_array( int fd, unsigned char *buffer, int length, int threshold,
-   int timeout );
-int get_java_var( JNIEnv *, jobject, char *, char * );
-void report(char *);
-void report_error(char *);
-void throw_java_exception( JNIEnv *, char *, char *, char * );
-void throw_java_exception_system_msg( JNIEnv *, char *, char * );
+	public List getPortIdentifiers() {
+		Enumeration e = CommPortIdentifier.getPortIdentifiers();
+		List l = new ArrayList();
+		while (e.hasMoreElements()) {
+			l.add(e.nextElement());
+		}
+		return l;
+	}
 
+	public void testGetPortIdentifiers() throws Exception {
+		List l = getPortIdentifiers();
+		assertFalse("has ports", l.isEmpty());
+	}
+
+	public void testGetPortIdentifier() throws Exception {
+		List l = getPortIdentifiers();
+		CommPortIdentifier first = (CommPortIdentifier) l.get(0);
+		CommPortIdentifier last = (CommPortIdentifier) l.get(l.size() - 1);
+		// first find by name
+		CommPortIdentifier p = CommPortIdentifier.getPortIdentifier(first.getName());
+		assertEquals("first found", p, first);
+		p = CommPortIdentifier.getPortIdentifier(last.getName());
+		assertEquals("last found", p, last);
+		// now the non-existent case
+		boolean exceptionThrown = false;
+		try {
+			p = CommPortIdentifier.getPortIdentifier("wuzziwuzz");
+		} catch (NoSuchPortException e) {
+			exceptionThrown = true;
+		}
+		assertTrue("invalid port", exceptionThrown);
+	}
+
+}

@@ -22,3 +22,7 @@ gradle-app.setting
 .apt_generated/
 #created by openiec61850 clientgui:
 lastconnection.properties
+build-native
+.idea
+jrxtx.iml
+build-download

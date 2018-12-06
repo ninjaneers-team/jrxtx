@@ -1,3 +1,4 @@
+
 /* init.c is used for compiling dll's with lcc.  More info in Makefile.lcc */
 
 #ifdef _WIN32
@@ -10,7 +11,7 @@
  * interface it satisfies lcc linker.
  */
 BOOL WINAPI __declspec(dllexport) LibMain(HINSTANCE hDLLInst, DWORD fdwReason, LPVOID lpvReserved) {
-	return TRUE;
+    return TRUE;
 }
 
 /**
@@ -20,8 +21,8 @@ BOOL WINAPI __declspec(dllexport) LibMain(HINSTANCE hDLLInst, DWORD fdwReason, L
  * Now in SerialImp.c
  */
 /*
- JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)   { return JNI_VERSION_1_2; }
- JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {}
- */
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *reserved)   { return JNI_VERSION_1_2; }
+JNIEXPORT void JNICALL JNI_OnUnload(JavaVM *vm, void *reserved) {}
+*/
 
 #endif

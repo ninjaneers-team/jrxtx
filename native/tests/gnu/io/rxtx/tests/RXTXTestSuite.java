@@ -1,7 +1,7 @@
 /*-------------------------------------------------------------------------
 |   RXTX License v 2.1 - LGPL v 2.1 + Linking Over Controlled Interface.
 |   RXTX is a native interface to serial ports in java.
-|   Copyright 1997-2007 by Trent Jarvi tjarvi@qbang.org and others who
+|   Copyright 2008 Martin Oberhuber (Wind River) and others who
 |   actually wrote it.  See individual source files for more information.
 |
 |   A copy of the LGPL v 2.1 may be found at
@@ -27,7 +27,7 @@
 |   any confusion about linking to RXTX.   We want to allow in part what
 |   section 5, paragraph 2 of the LGPL does not permit in the special
 |   case of linking over a controlled interface.  The intent is to add a
-|   Java Specification Request or standards body defined interface in the 
+|   Java Specification Request or standards body defined interface in the
 |   future as another exception but one is not currently available.
 |
 |   http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
@@ -55,50 +55,52 @@
 |   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 |   All trademarks belong to their respective owners.
 --------------------------------------------------------------------------*/
-/* gnu.io.ParallelPort constants */
-/*  this appears to be handled in /usr/src/linux/misc/parport_pc.c */
-#define LPT_MODE_ANY	0
-#define LPT_MODE_SPP	1
-#define LPT_MODE_PS2	2
-#define LPT_MODE_EPP	3
-#define LPT_MODE_ECP	4
-#define LPT_MODE_NIBBLE	5
+package gnu.io.rxtx.tests;
 
-/* some popular releases of Slackware do not have SSIZE_MAX */
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
-#ifndef SSIZE_MAX
-#	if defined(INT_MAX)
-#		define SSIZE_MAX  INT_MAX
-#	elif defined(MAXINT)
-#		define SSIZE_MAX MAXINT
-#	else
-#		define SSIZE_MAX 2147483647 /* ugh */
-#	endif
-#endif
+/**
+ * Main class bundling all single specialized test suites into a
+ * overall complete one.
+ */
+public class RXTXTestSuite extends TestCase {
 
-/* gnu.io.ParallelPortEvent constants */
-#define PAR_EV_ERROR	1
-#define PAR_EV_BUFFER	2
+	/**
+	 * Standard Java application main method. Allows to launch the test
+	 * suite from outside as part of nightly runs, headless runs or other.
+	 * <p><b>Note:</b> Use only <code>junit.textui.TestRunner</code> here as
+	 * it is explicitly supposed to output the test output to the shell the
+	 * test suite has been launched from.
+	 * <p>
+	 * @param args The standard Java application command line parameters passed in.
+	 */
+	public static void main(String[] args) {
+		junit.textui.TestRunner.run(suite());
+	}
 
-/* java exception class names */
-#define UNSUPPORTED_COMM_OPERATION "gnu/io/UnsupportedCommOperationException"
-#define ARRAY_INDEX_OUT_OF_BOUNDS "java/lang/ArrayIndexOutOfBoundsException"
-#define OUT_OF_MEMORY "java/lang/OutOfMemoryError"
-#define IO_EXCEPTION "java/io/IOException"
-#define PORT_IN_USE_EXCEPTION "gnu/io/PortInUseException"
+	/**
+	 * Combine all test into a suite and returns the test suite instance.
+	 * <p>
+	 * <b>Note: This method must be always called <i><code>suite</code></i> ! Otherwise
+	 * the JUnit plug-in test launcher will fail to detect this class!</b>
+	 * <p>
+	 * @return The test suite instance.
+	 */
+	public static Test suite() {
+		TestSuite suite = new TestSuite(RXTXTestSuite.class.getName());
 
-/*
-Flow Control defines inspired by reading how mgetty by Gert Doering does it
-*/
+		// add the single test suites to the overall one here.
+		suite.addTestSuite(CommPortIdentifierTest.class);
+		suite.addTestSuite(RXTXCommDriverTest.class);
+		return suite;
+	}
 
-/* PROTOTYPES */
-jboolean is_interrupted(JNIEnv *, jobject );
-int send_event(JNIEnv *, jobject, jint, int );
-int read_byte_array( int fd, unsigned char *buffer, int length, int threshold,
-   int timeout );
-int get_java_var( JNIEnv *, jobject, char *, char * );
-void report(char *);
-void report_error(char *);
-void throw_java_exception( JNIEnv *, char *, char *, char * );
-void throw_java_exception_system_msg( JNIEnv *, char *, char * );
-
+	/* (non-Javadoc)
+	 * @see org.eclipse.rse.tests.framework.AbstractTestSuiteHolder#getTestSuite()
+	 */
+	public TestSuite getTestSuite() {
+		return (TestSuite)RXTXTestSuite.suite();
+	}
+}
