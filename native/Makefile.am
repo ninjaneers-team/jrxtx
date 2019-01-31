@@ -27,7 +27,7 @@
 #   any confusion about linking to RXTX.   We want to allow in part what
 #   section 5, paragraph 2 of the LGPL does not permit in the special
 #   case of linking over a controlled interface.  The intent is to add a
-#   Java Specification Request or standards body defined interface in the 
+#   Java Specification Request or standards body defined interface in the
 #   future as another exception but one is not currently available.
 #
 #   http://www.fsf.org/licenses/gpl-faq.html#LinkingOverControlledInterface
@@ -99,7 +99,7 @@ $(target_triplet)/lib%.so: $(SPATH)/%Imp.@EXTENSION@ $(CLASSES)
 #  LIBTOOL_FIX handles problems encountered on some OS's.  See configure.in
 #  If a LIBTOOL_FIX is added be sure to provide a trailing ';' in configure.in
 
-$(target_triplet)/librxtx%.@LIB_EXTENSION@: $(SPATH)/%Imp.c dummy_javahfiles $(SPATH)/%Imp.h
+$(target_triplet)/$(LIB_PREFIX)rxtx%.@LIB_EXTENSION@: $(SPATH)/%Imp.c dummy_javahfiles $(SPATH)/%Imp.h
 	(								\
 	$(LIBTOOL_FIX)							\
 	cd $(DEST); 							\
@@ -148,27 +148,20 @@ docs: $(CLASSES)
 
 ################  WIN32 CrossCompiling from here down #######################
 
-$(DEST)/rxtxSerial.dll: $(CLASSES) $(TOP)/Makefile
-	gcc -DWIN32 -D __int64="long long" -mno-fp-ret-in-387 -b$(target_alias) -I $(TOP) -I $(DEST) -I . $(WINDOWS_JAVA_INCLUDE) -I $(SPATH) -Wall -c $(SPATH)/SerialImp.c -o $(DEST)/SerialImp.o
-	gcc -DWIN32 -D __int64="long long" -mno-fp-ret-in-387 -b$(target_alias) -I $(TOP) -I $(DEST) -I . $(WINDOWS_JAVA_INCLUDE) -I $(SPATH) -Wall -c $(SPATH)/termios.c -o $(DEST)/termios.o
-	gcc -DWIN32 -D __int64="long long" -mno-fp-ret-in-387 -b$(target_alias) -I $(TOP) -I $(DEST) -I . $(WINDOWS_JAVA_INCLUDE) -I $(SPATH) -Wall -c $(SPATH)/fixup.c -o $(DEST)/fixup.o
-	gcc -DWIN32 -D __int64="long long" -mno-fp-ret-in-387 -b$(target_alias) -I $(TOP) -I $(DEST) -I . $(WINDOWS_JAVA_INCLUDE) -I $(SPATH) -Wall -c $(SPATH)/init.cc -o $(DEST)/init.o
-	ld --base-file $(DEST)/Serial.base --dll -o $(DEST)/rxtxSerial.dll $(DEST)/termios.o $(DEST)/SerialImp.o $(DEST)/fixup.o $(DEST)/init.o -luser32 -lgdi32 -lcomdlg32 -lkernel32 -ladvapi32 -lmingw32 -lmoldname -lcrtdll -e _dll_entry@12 --base-file $(DEST)/Serial.base
-	 echo EXPORTS >$(DEST)/Serial.def;for i in `nm $(DEST)/rxtxSerial.dll | grep "T _Java"|cut -b 13-`;do echo -n $$i|sed s#@.*##;echo "="$$i;done >> $(DEST)/Serial.def
-	dlltool -b$(DEST) --as=as --dllname $(DEST)/rxtxSerial.dll --def $(DEST)/Serial.def --base-file $(DEST)/Serial.base --output-exp $(DEST)/Serial.exp
-	ld --base-file $(DEST)/Serial.base $(DEST)/Serial.exp -dll -o $(DEST)/rxtxSerial.dll $(DEST)/termios.o $(DEST)/SerialImp.o $(DEST)/fixup.o $(DEST)/init.o -luser32 -lgdi32 -lcomdlg32 -lkernel32 -ladvapi32 -lmingw32 -lmoldname -lcrtdll -e _dll_entry@12 --base-file $(DEST)/Serial.base
-	dlltool -b$(DEST) --as=as --dllname $(DEST)/rxtxSerial.dll --def $(DEST)/Serial.def --base-file $(DEST)/Serial.base --output-exp $(DEST)/Serial.exp
-	ld $(DEST)/Serial.exp -dll -o $(DEST)/rxtxSerial.dll $(DEST)/termios.o $(DEST)/SerialImp.o $(DEST)/fixup.o $(DEST)/init.o -luser32 -lgdi32 -lcomdlg32 -lkernel32 -ladvapi32 -lmingw32 -lmoldname -lcrtdll -e _dll_entry@12 --base-file $(DEST)/Serial.base
+WIN_CCFLAGS = -D__USE_MINGW_ANSI_STDIO -DWIN32 -D __int64="long long" -mno-fp-ret-in-387 -I $(TOP) -I $(DEST) -I . $(WINDOWS_JAVA_INCLUDE) $(JAVAINCLUDE) -I $(TOP)/include/jni/win32 -I $(target_triplet)/include -I $(SPATH) -Wall
 
-$(DEST)/rxtxParallel.dll: $(CLASSES) $(TOP)/Makefile
-	gcc -DWIN32 -D __int64="long long" -mno-fp-ret-in-387 -b$(target_alias) -I $(TOP) -I $(DEST) -I . $(WINDOWS_JAVA_INCLUDE) -I $(SPATH) -Wall -c $(SPATH)/ParallelImp.c -o $(DEST)/ParallelImp.o
-	gcc -DWIN32 -D __int64="long long" -mno-fp-ret-in-387 -b$(target_alias) -I $(TOP) -I $(DEST) -I . $(WINDOWS_JAVA_INCLUDE) -I $(SPATH) -Wall -c $(SPATH)/termios.c -o $(DEST)/termios.o
-	gcc -DWIN32 -D __int64="long long" -mno-fp-ret-in-387 -b$(target_alias) -I $(TOP) -I $(DEST) -I . $(WINDOWS_JAVA_INCLUDE) -I $(SPATH) -Wall -c $(SPATH)/fixup.c -o $(DEST)/fixup.o
-	gcc -DWIN32 -D __int64="long long" -mno-fp-ret-in-387 -b$(target_alias) -I $(TOP) -I $(DEST) -I . $(WINDOWS_JAVA_INCLUDE) -I $(SPATH) -Wall -c $(SPATH)/init.cc -o $(DEST)/init.o
-	ld --base-file $(DEST)/Parallel.base --dll -o $(DEST)/rxtxParallel.dll $(DEST)/termios.o $(DEST)/ParallelImp.o $(DEST)/fixup.o $(DEST)/init.o -luser32 -lgdi32 -lcomdlg32 -lkernel32 -ladvapi32 -lmingw32 -lmoldname -lcrtdll -e _dll_entry@12 --base-file $(DEST)/Parallel.base
-	 echo EXPORTS >$(DEST)/Parallel.def;for i in `nm $(DEST)/rxtxParallel.dll | grep "T _Java"|cut -b 13-`;do echo -n $$i|sed s#@.*##;echo "="$$i;done >> $(DEST)/Parallel.def
-	dlltool -b$(DEST) --as=as --dllname $(DEST)/rxtxParallel.dll --def $(DEST)/Parallel.def --base-file $(DEST)/Parallel.base --output-exp $(DEST)/Parallel.exp
-	ld --base-file $(DEST)/Parallel.base $(DEST)/Parallel.exp -dll -o $(DEST)/rxtxParallel.dll $(DEST)/termios.o $(DEST)/ParallelImp.o $(DEST)/fixup.o $(DEST)/init.o -luser32 -lgdi32 -lcomdlg32 -lkernel32 -ladvapi32 -lmingw32 -lmoldname -lcrtdll -e _dll_entry@12 --base-file $(DEST)/Parallel.base
-	dlltool -b$(DEST) --as=as --dllname $(DEST)/rxtxParallel.dll --def $(DEST)/Parallel.def --base-file $(DEST)/Parallel.base --output-exp $(DEST)/Parallel.exp
-	ld $(DEST)/Parallel.exp -dll -o $(DEST)/rxtxParallel.dll $(DEST)/termios.o $(DEST)/ParallelImp.o $(DEST)/fixup.o $(DEST)/init.o -luser32 -lgdi32 -lcomdlg32 -lkernel32 -ladvapi32 -lmingw32 -lmoldname -lcrtdll -e _dll_entry@12 --base-file $(DEST)/Parallel.base
+WIN_LDFLAGS = -luser32 -lgdi32 -lcomdlg32 -lkernel32 -ladvapi32 -lmingw32 -lmoldname -lcrtdll -lstdc++
 
+$(DEST)/rxtxSerial.dll: dummy_javahfiles $(TOP)/Makefile
+	$(CC) $(WIN_CCFLAGS) -c $(SPATH)/SerialImp.c -o $(DEST)/SerialImp.o
+	$(CC) $(WIN_CCFLAGS) -c $(SPATH)/termios.c -o $(DEST)/termios.o
+	$(CC) $(WIN_CCFLAGS) -c $(SPATH)/fixup.c -o $(DEST)/fixup.o
+	$(CC) $(WIN_CCFLAGS) -c $(SPATH)/init.cc -o $(DEST)/init.o
+	$(CC) -shared -o $(DEST)/rxtxSerial.dll $(DEST)/termios.o $(DEST)/SerialImp.o $(DEST)/fixup.o $(DEST)/init.o $(WIN_LDFLAGS) -e _dll_entry@12
+
+$(DEST)/rxtxParallel.dll: dummy_javahfiles $(TOP)/Makefile
+	$(CC) $(WIN_CCFLAGS) -c $(SPATH)/ParallelImp.c -o $(DEST)/ParallelImp.o
+	$(CC) $(WIN_CCFLAGS) -c $(SPATH)/termios.c -o $(DEST)/termios.o
+	$(CC) $(WIN_CCFLAGS) -c $(SPATH)/fixup.c -o $(DEST)/fixup.o
+	$(CC) $(WIN_CCFLAGS) -c $(SPATH)/init.cc -o $(DEST)/init.o
+	$(CC) -shared -o $(DEST)/rxtxParallel.dll $(DEST)/termios.o $(DEST)/ParallelImp.o $(DEST)/fixup.o $(DEST)/init.o $(WIN_LDFLAGS) -e _dll_entry@12

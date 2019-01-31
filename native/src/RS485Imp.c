@@ -93,10 +93,12 @@
 #if defined(__linux__)
 #	include <linux/types.h> /* fix for linux-2.3.4? kernels */
 #	include <linux/serial.h>
-#	include <linux/version.h>
+#	include <linux/version.h>TIOC
+#endif
+#ifndef WIN32
+extern int errno;
 #endif
 
-extern int errno;
 #include "RS485Imp.h"
 /* #define DEBUG_TIMEOUT */
 

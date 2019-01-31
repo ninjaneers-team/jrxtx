@@ -20,13 +20,13 @@ addons:
     - gcc-arm-linux-gnueabihf
     - libc6-dev-armel-cross
     - libc6-dev-armhf-cross
+    - mingw-w64
   homebrew:
     taps: homebrew/cask-versions
     casks:
       - java8
     packages:
       - python@2
-
 
 before_cache:
 - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -51,6 +51,7 @@ install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd native && ./BUILD.sh && cd ..; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd native && ./BUILD.sh --target=arm-linux-gnueabihf --host=arm-linux-gnueabihf && cd ..; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd native && ./BUILD.sh --target=arm-linux-gnueabi --host=arm-linux-gnueabi && cd ..; fi
+- if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then cd native && ./BUILD_mingw.sh && cd ..; fi
 - ./gradlew buildWithNative # also copies files into build-native
 
 script:
@@ -68,7 +69,7 @@ deploy:
       - build-native/*
     on:
       tags: true
-      
+
   ## wait some (for osx to finish building), then download native libs and deploy
   - provider: script
     api_key:

@@ -71,9 +71,8 @@
 #define YACK() \
 { \
 	char *allocTextBuf, message[80]; \
-	unsigned long nChars; \
 	unsigned int errorCode = GetLastError(); \
-	nChars = FormatMessage ( \
+	FormatMessage ( \
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | \
 		FORMAT_MESSAGE_FROM_SYSTEM, \
 		NULL, \
@@ -92,9 +91,8 @@
 #define YACK() \
 { \
 	char *allocTextBuf, message[80]; \
-	unsigned long nChars; \
 	unsigned int errorCode = GetLastError(); \
-	nChars = FormatMessage ( \
+	FormatMessage ( \
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | \
 		FORMAT_MESSAGE_FROM_SYSTEM, \
 		NULL, \
@@ -116,12 +114,13 @@ typedef unsigned int    tcflag_t;
 /* structs are from linux includes or linux man pages to match
    interfaces.
 */
-
+#ifndef _TIMESPEC_DEFINED
 struct timespec
 {
 	time_t	tv_sec;
 	long	tv_nsec;
 };
+#endif
 
 #define NCCS 32
 struct termios
@@ -191,7 +190,9 @@ int serial_select(int, struct fd_set *, struct fd_set *, struct fd_set *, struct
 void termios_interrupt_event_loop( int , int );
 void termios_setflags( int , int[] );
 struct termios_list *find_port( int );
+#ifndef _UNISTD_H
 void usleep(unsigned long usec);
+#endif
 int fcntl(int fd, int command, ...);
 const char *get_dos_port(const char *);
 void set_errno(int);
@@ -465,7 +466,7 @@ void termiosSetParityError( int, char );
 #define TIOCMSET	0x5418
 #define TIOCGSOFTCAR	0x5419
 #define TIOCSSOFTCAR	0x541a
-#define TIOCSER_TEMP	0x01
+#define TIOCSER_TEMT	0x01
 /*
 #define FIONREAD	0x541b
 TIOC[GS]SERIAL is not used on win32.  It was dropped after we could not

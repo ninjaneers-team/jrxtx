@@ -118,6 +118,7 @@ RXTX_PATH=
 EXTENSION="c"
 OBJECT_EXTENSION="lo"
 LIB_EXTENSION="la"
+LIB_PREFIX=""
 COMPILE="cc "
 TOP="`pwd`"
 GLIBTOOL="\$(SHELL) \$(TOP)/libtool"
@@ -515,7 +516,7 @@ fi
 
 #  http://www.tolstoy.com/samizdat/sysprops.html
 
-[ case $OS_NAME in 
+[ case $OS_NAME in
 Linux)
 	LDFLAGS=$LDFLAGS" -lpthread"
 	#check_kernel_headers
@@ -582,6 +583,12 @@ Linux)
 		#echo ----------------------------
 		#echo $target_os
 		#echo ----------------------------
+	;;
+	mingw32)
+		TARGETLIB="\$(target_triplet)/rxtxSerial.dll \$(target_triplet)/rxtxParallel.dll"
+		OBJECT_EXTENSION="lo"
+		LIB_EXTENSION="dll"
+		LIB_PREFIX=""
 	;;
 	esac
 ;;
@@ -749,7 +756,7 @@ WIN32)
 	WINDOWS_JAVA_INCLUDE="-I$WIN32INCLUDE -I$WIN32INCLUDE/win32"
 	fi
 	TARGETLIB="\$(target_triplet)/rxtxSerial.dll \$(target_triplet)/rxtxParallel.dll"
-	echo  "$WINDOWS_JAVA_INCLUDE" 
+	echo  "$WINDOWS_JAVA_INCLUDE"
 ;;
 
 Mac\ OS\ X)

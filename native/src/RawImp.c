@@ -75,6 +75,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#ifndef WIN32
 #include <sys/ioctl.h>
 #include <sys/param.h>
 #include <sys/utsname.h>
@@ -83,6 +84,9 @@
 #endif
 #ifdef HAVE_SYS_SIGNAL_H
 #   include <sys/signal.h>
+#endif
+#else
+#	include "win32termios.h"
 #endif
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -101,7 +105,9 @@
 #endif
 #ifndef __APPLE__  /* dima */
 #ifndef PPC
+#ifndef WIN32
 #include <sys/io.h>
+#endif /* WIN32 */
 #endif /* PPC */
 #endif /* dima */
 
