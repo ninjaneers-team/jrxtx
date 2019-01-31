@@ -79,6 +79,10 @@ configure(javaProjects) {
   }
   
   jar {
+    into("META-INF/maven/$project.group/$project.name") {
+      from { generatePomFileForMavenJavaPublication }
+      rename ".*", "pom.xml"
+    }
     manifest {
       version = project.version.replace("-",".");
     }
@@ -285,3 +289,13 @@ task (tarFull, type: Tar) {
   dependsOn(tar)
   archiveName = project.name + "-" + project.version + "_full.tgz"
 }
+
+apply plugin: 'maven-publish'
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+    }
+  }
+}
+
