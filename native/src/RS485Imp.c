@@ -93,7 +93,7 @@
 #if defined(__linux__)
 #	include <linux/types.h> /* fix for linux-2.3.4? kernels */
 #	include <linux/serial.h>
-#	include <linux/version.h>TIOC
+#	include <linux/version.h>
 #endif
 #ifndef WIN32
 extern int errno;
