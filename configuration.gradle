@@ -6,7 +6,7 @@ project.ext {
   cfgJavaVersion = "1.8"
 
   cfgVersion = "1.1.0"
-  
+
   cfgGroup = "de.ninjaneers"
 
   cfgCopyDependencies = false
@@ -35,7 +35,7 @@ project.ext {
 tasks.withType(Tar) {
 
   dependsOn("copyJavadoc")
-  
+
   into(project.name) {
     from("./") {
       include "build.gradle"
@@ -78,7 +78,7 @@ eclipse {
 
 tasks.withType(Javadoc) {
   exclude "**/gnu/**"
-  options.noTimestamp() 
+  options.noTimestamp()
 }
 
 
@@ -88,7 +88,7 @@ uploadArchives {
       pom.project {
         name "jRxTx"
         description "jRxTx is a library for Java serial communication."
-        
+
         licenses {
           license {
             name "GNU Lesser General Public License 2.1 or later + linking exception"
@@ -109,8 +109,8 @@ jar {
 
 dependencies {
   testCompile "org.mockito:mockito-core:1.10.19"
-  testCompile "org.powermock:powermock-api-mockito:1.6.4" 
-  testCompile "org.powermock:powermock-module-junit4:1.6.2" 
+  testCompile "org.powermock:powermock-api-mockito:1.6.4"
+  testCompile "org.powermock:powermock-module-junit4:1.6.2"
 }
 
 sourceSets {
@@ -122,10 +122,6 @@ sourceSets {
 def libName = "librxtxSerial"
 def bundleNativeCode = (String[])[]
 def resDir = project.sourceSets.main.output.resourcesDir
- 
-if (file("native/librxtxSerial.dll").exists()){
-    bundleNativeCode = bundleNativeCode.plus("libs/librxtxSerial.dll;osname=Win32;processor=x86")
-}
 
 def conf = [
         // downloaded
@@ -149,7 +145,12 @@ def conf = [
                 "annotation": "osname=Linux;processor=arm",
                 "target_filename": libName + ".so",
         ],
-        
+        ("build-download/Win32-x86_64/rxtxSerial.dll"): [
+                "target": "linux/arm",
+                "annotation": "osname=Win32;processor=x86_64",
+                "target_filename": "rxtxSerial.dll",
+        ],
+
         // built right here
         ("native/x86_64-*linux-*/.libs/" + libName + ".so"): [
                 "target": "linux/x86-64",
@@ -171,6 +172,11 @@ def conf = [
                 "annotation": "osname=Linux;processor=arm",
                 "target_filename": libName + ".so",
         ],
+        ("native/x86_64-w64-mingw32/rxtxSerial.dll"): [
+                "target": "Win32/x86_64",
+                "annotation": "osname=Win32;processor=x86_64",
+                "target_filename": "rxtxSerial.dll",
+        ],
 ]
 
 task copyNativeLibs(dependsOn: compileJava) {
@@ -181,7 +187,7 @@ task copyNativeLibs(dependsOn: compileJava) {
             def outFileName = map['target_filename']
             def outName = "libs/" + map['target'] + "/" + outFileName
             def fileOutDir = Paths.get(resDir.absolutePath, "libs", map['target'])
-            
+
             doLast {
                 copy {
                     from file
@@ -190,7 +196,7 @@ task copyNativeLibs(dependsOn: compileJava) {
                 }
                 copy {
                     from file
-                    into "build-native/" 
+                    into "build-native/"
                     rename  file.getName(), map['target'].replaceAll('/', '-') + "-" + file.getName()
                 }
             }
@@ -198,29 +204,31 @@ task copyNativeLibs(dependsOn: compileJava) {
             bundleNativeCode = bundleNativeCode.plus(outName + ";" + map['annotation'])
         }
     }
-}
-
-bundleNativeCode = bundleNativeCode.join(',')
-if(bundleNativeCode.length() > 0) {
-    println("test")
-    jar {
-        manifest {
-            instruction "Bundle-NativeCode", bundleNativeCode
+    doLast {
+        bundleNativeCode = bundleNativeCode.join(',')
+        if(bundleNativeCode.length() > 0) {
+            jar {
+                manifest {
+                    instruction "Bundle-NativeCode", bundleNativeCode
+                }
+            }
         }
     }
 }
+
 
 task(buildWithNative) {
   dependsOn(copyNativeLibs)
   dependsOn(build)
   tasks.findByName("build").mustRunAfter "copyNativeLibs"
-    tasks.findByName("copyNativeLibs").mustRunAfter "processResources"
+  tasks.findByName("jar").mustRunAfter "copyNativeLibs"
+  tasks.findByName("copyNativeLibs").mustRunAfter "processResources"
 }
 
 
 clean {
   /*file("native").listFiles().each{
-  	File f ->  
+  	File f ->
   		if (f.getName().contains("unknown")) {
   			delete f
   		}
@@ -237,7 +245,7 @@ compileJava {
 
 task javah(dependsOn: compileJava) {
   doLast{
-	  def Nclasses = [	
+	  def Nclasses = [
 	    "gnu.io.RXTXCommDriver",
 	    "gnu.io.CommPortIdentifier",
 	    "gnu.io.RXTXVersion",
@@ -249,13 +257,13 @@ task javah(dependsOn: compileJava) {
 	    "gnu.io.RS485",
 	    "gnu.io.ParallelPort"
 	  ];
-	    
+
 	  def nativeIncludes = "native/src/include"
 	  def classpath = sourceSets.main.output.classesDir
 	  for (Nclass in Nclasses) {
-	      
+
 	    logger.info("Generating header for " + Nclass)
-	      
+
 	    exec {
 		  executable "javah"
 		  args "-d", "$nativeIncludes", "-classpath", "$classpath" , Nclass
