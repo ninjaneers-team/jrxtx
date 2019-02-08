@@ -5,7 +5,7 @@ project.ext {
 
   cfgJavaVersion = "1.8"
 
-  cfgVersion = "1.1.0"
+  cfgVersion = "1.2.0"
 
   cfgGroup = "de.ninjaneers"
 
@@ -145,9 +145,9 @@ def conf = [
                 "annotation": "osname=Linux;processor=arm",
                 "target_filename": libName + ".so",
         ],
-        ("build-download/Win32-x86_64/rxtxSerial.dll"): [
+        ("build-download/win32-x86_64/rxtxSerial.dll"): [
                 "target": "linux/arm",
-                "annotation": "osname=Win32;processor=x86_64",
+                "annotation": "osname=win32;processor=x86_64",
                 "target_filename": "rxtxSerial.dll",
         ],
 
