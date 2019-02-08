@@ -146,7 +146,7 @@ def conf = [
                 "target_filename": libName + ".so",
         ],
         ("build-download/win32-x86_64/rxtxSerial.dll"): [
-                "target": "linux/arm",
+                "target": "win32/x86_64",
                 "annotation": "osname=win32;processor=x86_64",
                 "target_filename": "rxtxSerial.dll",
         ],
