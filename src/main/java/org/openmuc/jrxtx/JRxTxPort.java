@@ -43,15 +43,18 @@ class JRxTxPort implements SerialPort {
     private FlowControl flowControl;
 
     public static JRxTxPort openSerialPort(String portName, int baudRate, Parity parity, DataBits dataBits,
-            StopBits stopBits, FlowControl flowControl) throws SerialPortException {
-        try {
+            StopBits stopBits, FlowControl flowControl) throws SerialPortException
+    {
+        CommPort comPort = null;
+        try
+        {
             System.setProperty("gnu.io.rxtx.SerialPorts", portName);
 
             CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
 
             String theOwner = JRxTxPort.class.getCanonicalName() + System.currentTimeMillis();
 
-            CommPort comPort = portIdentifier.open(theOwner, 0);
+            comPort = portIdentifier.open(theOwner, 0);
 
             if (!(comPort instanceof RXTXPort)) {
                 throw new SerialPortException("Unable to open the serial port. Port is not RXTX.");
@@ -60,11 +63,11 @@ class JRxTxPort implements SerialPort {
             RXTXPort rxtxPort = (RXTXPort) comPort;
 
             try {
-                rxtxPort.setSerialPortParams(baudRate, dataBits.getOldValue(), stopBits.getOldValue(),
-                        parity.getOldValue());
+                rxtxPort.setSerialPortParams(baudRate, dataBits.getOldValue(), stopBits.getOldValue(), parity.getOldValue());
 
                 setFlowControl(flowControl, rxtxPort);
-            } catch (UnsupportedCommOperationException e) {
+            }
+            catch (UnsupportedCommOperationException e) {
                 String message = format("Unable to apply config on serial port.\n{0}", e.getMessage());
                 throw new SerialPortException(message);
             }
@@ -76,8 +79,11 @@ class JRxTxPort implements SerialPort {
         } catch (PortInUseException e) {
             String errMessage = format("Serial port {0} is already in use.", portName);
             throw new PortNotFoundException(errMessage);
+        } finally {
+            if (comPort != null) {
+                comPort.close();
+            }
         }
-
     }
 
     private static void setFlowControl(FlowControl flowControl, RXTXPort rxtxPort) {
