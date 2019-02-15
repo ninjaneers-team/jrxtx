@@ -69,6 +69,7 @@ class JRxTxPort implements SerialPort {
             }
             catch (UnsupportedCommOperationException e) {
                 String message = format("Unable to apply config on serial port.\n{0}", e.getMessage());
+                comPort.close();
                 throw new SerialPortException(message);
             }
 
@@ -79,10 +80,6 @@ class JRxTxPort implements SerialPort {
         } catch (PortInUseException e) {
             String errMessage = format("Serial port {0} is already in use.", portName);
             throw new PortNotFoundException(errMessage);
-        } finally {
-            if (comPort != null) {
-                comPort.close();
-            }
         }
     }
 
