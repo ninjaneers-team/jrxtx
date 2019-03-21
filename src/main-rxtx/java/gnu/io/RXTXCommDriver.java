@@ -521,7 +521,8 @@ public class RXTXCommDriver implements CommDriver {
                         "ttyUSB", // linux USB serial converters
                         "ttyV", // linux Comtrol VS-1000 serial controller
                         "ttyW", // linux specialix cards
-                        "ttyX" // linux SpecialX serial card
+                        "ttyX", // linux SpecialX serial card
+                        "ttyO" // BeagleBone
                 };
                 CandidatePortPrefixes = Temp;
             }
@@ -556,7 +557,8 @@ public class RXTXCommDriver implements CommDriver {
                         "cuaF", // Stallion Brumby (stli) dialout ports
                         "ttyR", // Rocketport dialin ports
                         "cuaR", // Rocketport dialout ports
-                        "stl" // Stallion EasyIO board or Brumby N
+                        "stl", // Stallion EasyIO board or Brumby N
+                        "ttyO" // BeagleBone
                 };
                 CandidatePortPrefixes = Temp;
             }
@@ -615,7 +617,8 @@ public class RXTXCommDriver implements CommDriver {
                         // Keyspan USA-19 adapter
                         "cu.KeyUSA19181.",
                         // Keyspan USA-19 adapter
-                        "tty.KeyUSA19181." };
+                        "tty.KeyUSA19181.",
+                };
                 CandidatePortPrefixes = Temp;
             }
             else if (osName.toLowerCase().indexOf("windows") != -1) {
