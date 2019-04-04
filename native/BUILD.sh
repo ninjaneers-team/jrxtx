@@ -3,7 +3,7 @@ set -eu
 
 ./autogen.sh
 
-./configure "$@"
+./configure --disable-lockfiles "$@"
 
 make clean
 make
