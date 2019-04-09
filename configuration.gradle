@@ -5,7 +5,7 @@ project.ext {
 
   cfgJavaVersion = "1.8"
 
-  cfgVersion = "1.4.1"
+  cfgVersion = "1.4.2"
 
   cfgGroup = "de.ninjaneers"
 
@@ -137,12 +137,12 @@ def conf = [
         ],
         ("build-download/linux-armel/" + libName + ".so"): [
                 "target": "linux/armel",
-                "annotation": "osname=Linux;processor=armel",
+                "annotation": "osname=Linux;processor=armel;processor=arm_le_sf",
                 "target_filename": libName + ".so",
         ],
         ("build-download/linux-arm/" + libName + ".so"): [
                 "target": "linux/arm",
-                "annotation": "osname=Linux;processor=arm",
+                "annotation": "osname=Linux;processor=arm;processor=arm_le",
                 "target_filename": libName + ".so",
         ],
         ("build-download/win32-x86_64/rxtxSerial.dll"): [
@@ -164,12 +164,12 @@ def conf = [
         ],
         ("native/arm-unknown-linux-gnueabi/.libs/" + libName + ".so"): [
                 "target": "linux/armel",
-                "annotation": "osname=Linux;processor=armel",
+                "annotation": "osname=Linux;processor=armel;processor=arm_le_sf",
                 "target_filename": libName + ".so",
         ],
         ("native/arm-unknown-linux-gnueabihf/.libs/" + libName + ".so"): [
                 "target": "linux/arm",
-                "annotation": "osname=Linux;processor=arm",
+                "annotation": "osname=Linux;processor=arm;processor=arm_le",
                 "target_filename": libName + ".so",
         ],
         ("native/x86_64-w64-mingw32/rxtxSerial.dll"): [

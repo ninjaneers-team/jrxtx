@@ -75,7 +75,7 @@ public class RXTXVersion {
 
     static {
         LibraryLoader.loadRxtxNative();
-        Version = "jRXTX-ninjaneers-1.4.1";
+        Version = "jRXTX-ninjaneers-1.4.2";
     }
 
     /**

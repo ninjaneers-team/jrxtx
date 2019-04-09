@@ -109,14 +109,6 @@ public class RXTXCommDriver implements CommDriver {
             }
         }
 
-        if (!JarVersion.equals(LibVersion)) {
-            System.out.println("WARNING:  RXTX Version mismatch\n\tJar version = " + JarVersion
-                    + "\n\tnative lib Version = " + LibVersion);
-        }
-        else if (debug) {
-            System.out.println(
-                    "RXTXCommDriver:\n\tJar version = " + JarVersion + "\n\tnative lib Version = " + LibVersion);
-        }
     }
 
     /** Get the Serial port prefixes for the running OS */
